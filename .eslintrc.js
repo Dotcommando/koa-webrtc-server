@@ -1,6 +1,7 @@
 module.exports = {
     root: true,
     parserOptions: {
+        ecmaVersion: 9,
         sourceType: 'module',
     },
     env: {
@@ -57,7 +58,7 @@ module.exports = {
         /* Отсутпы пробелами */
         'indent': [ 'error', 4, ],
         /* Отступ перед открывающей скобкой функции */
-        'space-before-function-paren': [ 'error', 'never', ],
+        'space-before-function-paren': [ 'error', { 'asyncArrow': 'always', }, ],
         /* Отступы между скобками и выражением внутри */
         'space-in-parens': [ 'error', 'never', ],
         /* Отступы перед двоеточием и после */
