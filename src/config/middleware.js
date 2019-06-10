@@ -1,8 +1,9 @@
 import koaCompress from 'koa-compress'
 import koaHelmet from 'koa-helmet'
 import cors from 'koa2-cors'
-import koaBody from 'koa-body'
-import morgan from 'morgan'
+import bodyParser from 'koa-bodyparser'
+import passport from 'koa-passport'
+import morgan from 'koa-morgan'
 import errorHandler from './error-handler'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -20,7 +21,8 @@ export default app => {
             origin: [ 'http://localhost:4200', 'http://localhost:8080', ],
         })
     )
-    app.use(koaBody())
+    app.use(bodyParser())
+    app.use(passport.initialize())
 
     if (isDev) {
         app.use(morgan('dev'))

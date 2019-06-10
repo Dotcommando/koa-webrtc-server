@@ -1,5 +1,6 @@
 const devConfig = {
     MONGO_URL: 'mongodb://localhost/koa-webrtc-server',
+    JWT_SECRET: 'PaI4JO8yfgQkw2o0893wM1w34230efLh',
 }
 
 const testConfig = {
