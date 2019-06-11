@@ -42,13 +42,13 @@ router.post(
  * @req.query.skip - integer, positive or zero.
  * @req.query.limit - integer, positive or zero.
  */
-// router.get(
-//     basePath + '/',
-//     authJwt,
-//     AccessControl.HasAnyRole([ 'superadmin', 'admin', 'readonly', ]),
-//     userValidation.getUsersList,
-//     userController.getUsersList,
-// )
+router.get(
+    basePath + '/',
+    authJwt,
+    // AccessControl.HasAnyRole([ 'superadmin', 'admin', 'readonly', ]),
+    // userValidation.getUsersList,
+    userController.getUsersList,
+)
 
 /**
  * Получить Юзера по Id.

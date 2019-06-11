@@ -29,12 +29,17 @@ export async function login (ctx, next) {
 
 export async function getUsersList (ctx, next) {
     try {
-        const limit = parseInt(req.query.limit, 10)
-        const skip = parseInt(req.query.skip, 10)
+        ctx.status = HTTPStatus.OK
+        const limit = ctx.request.query.limit ? parseInt(ctx.request.query.limit, 10) : 0
+        const skip = ctx.request.query.skip ? parseInt(ctx.request.query.skip, 10) : 0
         const users = await User.list({ limit, skip, })
-        return res.status(HTTPStatus.OK).json(users)
+        ctx.body = {
+            success: true,
+            users,
+        }
+        return next()
     } catch (err) {
-        return res.status(HTTPStatus.BAD_REQUEST).json(err)
+        ctx.status = HTTPStatus.BAD_REQUEST
     }
 }
 

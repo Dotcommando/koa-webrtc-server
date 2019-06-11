@@ -81,7 +81,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
     User.findById(id, (err, user) => {
-        done(err, user.username)
+        done(err, user.userName)
     })
 })
 
@@ -100,4 +100,9 @@ export const authLocal = async function (ctx) {
     )(ctx)
 }
 
-export const authJwt = passport.authenticate('jwt', { session: false, })
+export const authJwt = async function (ctx, next) {
+    return passport.authenticate(
+        'jwt',
+        { session: false, },
+    )(ctx, next)
+}
