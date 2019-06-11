@@ -6,35 +6,37 @@ import User from './user.model'
 export async function signUp (ctx, next) {
     try {
         ctx.status = HTTPStatus.CREATED
-        ctx.body = await User.create(ctx.request.body)
-        // return res.status(HTTPStatus.CREATED).json(user.toAuthJSON())
+        const newUser = await User.create(ctx.request.body)
+        ctx.body = { user: newUser.toAuthJSON(), success: true, }
+        return next()
     } catch (err) {
         ctx.status = HTTPStatus.BAD_REQUEST
         ctx.body = {
+            success: false,
             message: err.message,
         }
     }
 }
 
-// export function login (req, res, next) {
-//     try {
-//         res.status(HTTPStatus.OK).json(req.user.toAuthJSON())
-//         return next()
-//     } catch (err) {
-//         return res.status(HTTPStatus.UNAUTHORIZED).json(err)
-//     }
-// }
+export async function login (ctx, next) {
+    try {
+        ctx.status = HTTPStatus.OK
+        return next()
+    } catch (err) {
+        ctx.status = HTTPStatus.UNAUTHORIZED
+    }
+}
 
-// export async function getUsersList (req, res) {
-//     try {
-//         const limit = parseInt(req.query.limit, 10)
-//         const skip = parseInt(req.query.skip, 10)
-//         const users = await User.list({ limit, skip, })
-//         return res.status(HTTPStatus.OK).json(users)
-//     } catch (err) {
-//         return res.status(HTTPStatus.BAD_REQUEST).json(err)
-//     }
-// }
+export async function getUsersList (ctx, next) {
+    try {
+        const limit = parseInt(req.query.limit, 10)
+        const skip = parseInt(req.query.skip, 10)
+        const users = await User.list({ limit, skip, })
+        return res.status(HTTPStatus.OK).json(users)
+    } catch (err) {
+        return res.status(HTTPStatus.BAD_REQUEST).json(err)
+    }
+}
 
 // export async function getUserById (req, res) {
 //     try {

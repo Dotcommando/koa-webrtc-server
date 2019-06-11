@@ -1,10 +1,10 @@
 import mongoose, { Schema, } from 'mongoose'
-// import validator from 'validator'
+import validator from 'validator'
 import { hashSync, compareSync, } from 'bcrypt-nodejs'
 import jwt from 'jsonwebtoken'
 import uniqueValidator from 'mongoose-unique-validator'
 
-// import { passwordReg, } from './user.validation'
+import { passwordReg, } from './user.validation'
 import constants from '../../config/constants'
 // import Room from '../rooms/room.model'
 
@@ -15,12 +15,12 @@ const UserSchema = new Schema(
             unique: true,
             required: [ true, 'E-mail is required.', ],
             trim: true,
-            // validate: {
-            //     validator (email) {
-            //         return validator.isEmail(email)
-            //     },
-            //     message: '{VALUE} is not a valid email.',
-            // },
+            validate: {
+                validator (email) {
+                    return validator.isEmail(email)
+                },
+                message: '{VALUE} is not a valid email.',
+            },
         },
         lastName: {
             type: String,
@@ -42,12 +42,12 @@ const UserSchema = new Schema(
             type: String,
             required: [ true, 'Password is required.', ],
             minLength: [ 6, 'Passwords needs to be longer!', ],
-            // validate: {
-            //     validator (password) {
-            //         return passwordReg.test(password)
-            //     },
-            //     message: '{VALUE} is not a valid password.',
-            // },
+            validate: {
+                validator (password) {
+                    return passwordReg.test(password)
+                },
+                message: '{VALUE} is not a valid password.',
+            },
         },
         // roles: [
         //     {
@@ -127,7 +127,7 @@ UserSchema.methods = {
 UserSchema.statics = {
     list ({ limit, skip, } = {}) {
         return this.find()
-            .populate({ path: 'roles', populate: { path: 'permissions', }, })
+            // .populate({ path: 'roles', populate: { path: 'permissions', }, })
             .skip(skip)
             .limit(limit)
     },

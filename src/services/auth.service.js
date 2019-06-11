@@ -1,6 +1,7 @@
 import passport from 'koa-passport'
 import LocalStrategy from 'passport-local'
 import { Strategy as JWTStrategy, ExtractJwt, } from 'passport-jwt'
+import HTTPStatus from 'http-status'
 
 import User from '../modules/users/user.model'
 import constants from '../config/constants'
@@ -74,12 +75,29 @@ const jwtStrategy = new JWTStrategy(jwtOpts, async (payload, done) => {
 
 passport.use(localStrategy)
 passport.use(jwtStrategy)
+passport.serializeUser((user, done) => {
+    done(null, user)
+})
 
-export const authLocal = passport.authenticate(
-    'local',
-    { session: false, },
-    // (err, user, info) => {
-    //   console.log(info);
-    // }
-)
+passport.deserializeUser((id, done) => {
+    User.findById(id, (err, user) => {
+        done(err, user.username)
+    })
+})
+
+export const authLocal = async function (ctx) {
+    return passport.authenticate(
+        'local',
+        { session: false, },
+        (err, user, info, status) => {
+            if (user === false) {
+                ctx.throw(HTTPStatus.UNAUTHORIZED)
+            } else {
+                ctx.body = { success: true, user: user.toAuthJSON(), }
+                return ctx.login(user)
+            }
+        }
+    )(ctx)
+}
+
 export const authJwt = passport.authenticate('jwt', { session: false, })

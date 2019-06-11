@@ -29,12 +29,12 @@ router.post(
  * @req.body.email - email or Username, string, required.
  * @req.body.password - string, required.
  */
-// router.post(
-//     basePath + '/login',
-//     // userValidation.login,
-//     authLocal,
-//     userController.login
-// )
+router.post(
+    basePath + '/login',
+    // userValidation.login,
+    authLocal,
+    userController.login
+)
 
 /**
  * Получить список Юзеров.
