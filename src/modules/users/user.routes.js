@@ -55,13 +55,13 @@ router.get(
  *
  * @req.params.id - MongoId, required.
  */
-// router.get(
-//     basePath + '/:id/',
-//     authJwt,
-//     AccessControl.HasAnyRole([ 'superadmin', 'admin', 'readonly', ]),
-//     userValidation.checkUserID('Request for get User by Id is invalid.'),
-//     userController.getUserById,
-// )
+router.get(
+    basePath + '/:id/',
+    authJwt,
+    // AccessControl.HasAnyRole([ 'superadmin', 'admin', 'readonly', ]),
+    // userValidation.checkUserID('Request for get User by Id is invalid.'),
+    userController.getUserById,
+)
 
 /**
  * Обновить Юзера, кроме Ролей.

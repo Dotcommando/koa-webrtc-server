@@ -6,15 +6,13 @@ import User from './user.model'
 export async function signUp (ctx, next) {
     try {
         ctx.status = HTTPStatus.CREATED
-        const newUser = await User.create(ctx.request.body)
-        ctx.body = { user: newUser.toAuthJSON(), success: true, }
+        const newUser = await User.create(ctx.request.body).catch(() => ctx.throw(409, 'Duplicate key detected during user creation.'))
+        ctx.body = { user: newUser.toAuthJSON(), }
         return next()
     } catch (err) {
-        ctx.status = HTTPStatus.BAD_REQUEST
-        ctx.body = {
-            success: false,
-            message: err.message,
-        }
+        ctx.status = err.status || HTTPStatus.BAD_REQUEST
+        ctx.body = { message: err.message, }
+        return next()
     }
 }
 
@@ -23,7 +21,9 @@ export async function login (ctx, next) {
         ctx.status = HTTPStatus.OK
         return next()
     } catch (err) {
-        ctx.status = HTTPStatus.UNAUTHORIZED
+        ctx.status = err.status || HTTPStatus.BAD_REQUEST
+        ctx.body = { message: err.message, }
+        return next()
     }
 }
 
@@ -33,30 +33,30 @@ export async function getUsersList (ctx, next) {
         const limit = ctx.request.query.limit ? parseInt(ctx.request.query.limit, 10) : 0
         const skip = ctx.request.query.skip ? parseInt(ctx.request.query.skip, 10) : 0
         const users = await User.list({ limit, skip, })
-        ctx.body = {
-            success: true,
-            users,
-        }
+        ctx.body = { users, }
         return next()
     } catch (err) {
-        ctx.status = HTTPStatus.BAD_REQUEST
+        ctx.status = err.status || HTTPStatus.BAD_REQUEST
+        ctx.body = { message: err.message, }
+        return next()
     }
 }
 
-// export async function getUserById (req, res) {
-//     try {
-//         const user = req._user
-//             ? req._user
-//             : await User.findById(req.params.id)
-//         // .populate({ path: 'roles', populate: { path: 'permissions', }, })
-//         // .catch(
-//         //     () => new Error(`Can not find User with id === ${req.params.id}.`),
-//         // )
-//         return res.status(HTTPStatus.OK).json(user.toAdminJSON())
-//     } catch (err) {
-//         return res.status(HTTPStatus.BAD_REQUEST).json(err)
-//     }
-// }
+export async function getUserById (ctx, next) {
+    try {
+        const user = await User.findById(ctx.params.id)
+        // .populate({ path: 'roles', populate: { path: 'permissions', }, })
+        // .catch(
+        //     () => new Error(`Can not find User with id === ${req.params.id}.`),
+        // )
+        ctx.body = { user: user.toAdminJSON(), }
+        return next()
+    } catch (err) {
+        ctx.status = err.status || HTTPStatus.BAD_REQUEST
+        ctx.body = { message: err.message, }
+        return next()
+    }
+}
 
 /**
  * Обновляет Юзера. Кроме Ролей.

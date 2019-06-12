@@ -89,9 +89,10 @@ export const authLocal = async function (ctx) {
     return passport.authenticate(
         'local',
         { session: false, },
-        (err, user, info, status) => {
+        (err, user) => {
             if (user === false) {
-                ctx.throw(HTTPStatus.UNAUTHORIZED)
+                ctx.status = HTTPStatus.UNAUTHORIZED
+                ctx.body = { message: 'Unauthorized.', success: false, }
             } else {
                 ctx.body = { success: true, user: user.toAuthJSON(), }
                 return ctx.login(user)
@@ -104,5 +105,14 @@ export const authJwt = async function (ctx, next) {
     return passport.authenticate(
         'jwt',
         { session: false, },
+        (err, user) => {
+            if (user) {
+                return next()
+            }
+            else {
+                ctx.status = HTTPStatus.UNAUTHORIZED
+                ctx.body = { message: 'Unauthorized.', success: false, }
+            }
+        }
     )(ctx, next)
 }
