@@ -86,14 +86,14 @@ router.get(
  *
  * @req.body.roles - array of roles.
  */
-// router.patch(
-//     basePath + '/:id/add-roles',
-//     authJwt,
-//     AccessControl.HasAnyRole([ 'superadmin', 'admin', ]),
-//     userValidation.checkRoles,
-//     userController.transformRolesSkipInvalid,
-//     userController.updateUserRoles,
-// )
+router.patch(
+    basePath + '/:id/add-roles',
+    authJwt,
+    // AccessControl.HasAnyRole([ 'superadmin', 'admin', ]),
+    // userValidation.checkRoles,
+    userController.transformRolesSkipInvalid,
+    userController.updateUserRoles,
+)
 
 /**
  * Удалить Роли у Юзера.

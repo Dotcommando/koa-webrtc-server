@@ -49,12 +49,12 @@ const UserSchema = new Schema(
                 message: '{VALUE} is not a valid password.',
             },
         },
-        // roles: [
-        //     {
-        //         type: Schema.Types.ObjectId,
-        //         ref: 'Role',
-        //     },
-        // ],
+        roles: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Role',
+            },
+        ],
     },
     { timestamps: true, },
 )
@@ -90,7 +90,7 @@ UserSchema.methods = {
             email: this.email,
             firstName: this.firstName,
             lastName: this.lastName,
-            // roles: this.roles,
+            roles: this.roles,
         }
     },
     toAuthJSON () {
@@ -99,15 +99,15 @@ UserSchema.methods = {
             email: this.email,
             firstName: this.firstName,
             lastName: this.lastName,
-            // roles: this.roles.map(item => {
-            //     return {
-            //         name: item.name,
-            //         permissions: item.permissions.map(perm => [
-            //             perm.action,
-            //             perm.subject,
-            //         ]),
-            //     }
-            // }),
+            roles: this.roles.map(item => {
+                return {
+                    name: item.name,
+                    permissions: item.permissions.map(perm => [
+                        perm.action,
+                        perm.subject,
+                    ]),
+                }
+            }),
             token: `JWT ${this.createToken()}`,
         }
     },
@@ -118,7 +118,7 @@ UserSchema.methods = {
             email: this.email,
             firstName: this.firstName,
             lastName: this.lastName,
-            // roles: this.roles,
+            roles: this.roles,
             token: `JWT ${this.createToken()}`,
         }
     },
@@ -127,7 +127,7 @@ UserSchema.methods = {
 UserSchema.statics = {
     list ({ limit, skip, } = {}) {
         return this.find()
-            // .populate({ path: 'roles', populate: { path: 'permissions', }, })
+            .populate({ path: 'roles', populate: { path: 'permissions', }, })
             .skip(skip)
             .limit(limit)
     },
@@ -138,19 +138,19 @@ UserSchema.statics = {
    * @param roles - массив ObjectId Ролей.
    * @returns {Promise<void>}
    */
-    // async updateRoles (userId, roles) {
-    //     return await this.findOneAndUpdate(
-    //         { _id: userId, },
-    //         {
-    //             $addToSet: {
-    //                 roles: {
-    //                     $each: roles,
-    //                 },
-    //             },
-    //         },
-    //         { new: true, },
-    //     ).populate({ path: 'roles', populate: { path: 'permissions', }, })
-    // },
+    async updateRoles (userId, roles) {
+        return await this.findOneAndUpdate(
+            { _id: userId, },
+            {
+                $addToSet: {
+                    roles: {
+                        $each: roles,
+                    },
+                },
+            },
+            { new: true, },
+        ).populate({ path: 'roles', populate: { path: 'permissions', }, })
+    },
 
     /**
    * Удаляет Роли из массива Ролей Юзера.
@@ -158,17 +158,17 @@ UserSchema.statics = {
    * @param roles - массив ObjectId Ролей.
    * @returns {Promise<void>}
    */
-//     async deleteRoles (userId, roles) {
-//         return await this.findOneAndUpdate(
-//             { _id: userId, },
-//             {
-//                 $pullAll: {
-//                     roles,
-//                 },
-//             },
-//             { new: true, },
-//         ).populate({ path: 'roles', populate: { path: 'permissions', }, })
-//     },
+    async deleteRoles (userId, roles) {
+        return await this.findOneAndUpdate(
+            { _id: userId, },
+            {
+                $pullAll: {
+                    roles,
+                },
+            },
+            { new: true, },
+        ).populate({ path: 'roles', populate: { path: 'permissions', }, })
+    },
 }
 
 /**
@@ -176,27 +176,27 @@ UserSchema.statics = {
  * При удалении Юзера, ищет таски, созданные им
  * и очищает таскам поле user.
  */
-// UserSchema.pre('remove', async function (next) {
-//     const rooms = await Room.find({
-//         user: this._id,
-//     })
-//     if (!rooms) {
-//         return next()
-//     }
-//     const ids = rooms.map(item => item._id)
-//     await Room.updateMany(
-//         {
-//             _id: { $in: ids, },
-//         },
-//         {
-//             user: null,
-//         },
-//     )
-//     return next()
-// })
+UserSchema.pre('remove', async function (next) {
+    const rooms = await Room.find({
+        user: this._id,
+    })
+    if (!rooms) {
+        return next()
+    }
+    const ids = rooms.map(item => item._id)
+    await Room.updateMany(
+        {
+            _id: { $in: ids, },
+        },
+        {
+            user: null,
+        },
+    )
+    return next()
+})
 
-// UserSchema.plugin(uniqueValidator, {
-//     message: '{VALUE} is already taken.',
-// })
+UserSchema.plugin(uniqueValidator, {
+    message: '{VALUE} is already taken.',
+})
 
 export default mongoose.model('User', UserSchema)
